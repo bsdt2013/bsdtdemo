@@ -1,9 +1,188 @@
-{% if latest_poll_list %}
-    <ul>
-    {% for poll in latest_poll_list %}
-        <li><a href="/polls/{{ poll.key.id }}/">{{ poll.question }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No polls are available.</p>
-{% endif %}
+<!DOCTYPE html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>BSDT - Google App Engine </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="/resources/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 20px;
+        padding-bottom: 40px;
+      }
+
+      /* Custom container */
+      .container-narrow {
+        margin: 0 auto;
+        max-width: 700px;
+      }
+      .container-narrow > hr {
+        margin: 30px 0;
+      }
+
+      /* Main marketing message and sign up button */
+      .jumbotron {
+        margin: 60px 0;
+        text-align: center;
+      }
+      .jumbotron h1 {
+        font-size: 72px;
+        line-height: 1;
+      }
+      .jumbotron .btn {
+        font-size: 21px;
+        padding: 14px 24px;
+      }
+
+      /* Supporting marketing content */
+      .marketing {
+        margin: 60px 0;
+      }
+      .marketing p + h4 {
+        margin-top: 28px;
+      }
+    </style>
+    <link href="/resources/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/resources/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/resources/ico/apple-touch-icon-114-precomposed.png">
+      <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/resources/ico/apple-touch-icon-72-precomposed.png">
+                    <link rel="apple-touch-icon-precomposed" href="/resources/ico/apple-touch-icon-57-precomposed.png">
+                                   <link rel="shortcut icon" href="/resources/ico/favicon.png">
+  <style class="flashcontrol" style="display: none;" type="text/css">/*FlashControl*/object[type$="x-shockwave-flash"]:not([classid]),object[type$="futuresplash"]:not([classid]),embed[type$="x-shockwave-flash"],embed[type$="futuresplash"]{display:none !important}</style></head>
+
+  <body>
+
+    <div class="container-narrow">
+
+      <div class="masthead">
+        <ul class="nav nav-pills pull-right">
+          <li class="active"><a href="/">Home</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
+        <h3 class="muted">BSDT - Google App Engine</h3>
+      </div>
+
+      <hr>
+
+      <div class="jumbotron">
+        <h1>¡Google Datastore vuela!</h1>
+        <p class="lead">Un ejemplo de como integrar tecnologías de última generación para crear servicios a prueba del big user.</p>
+        <a class="btn btn-large btn-success" href="#">¡Añade una votación!</a>
+      </div>
+
+      <hr>
+
+      <div class="row-fluid marketing">
+        <div class="span6">
+            <h4>Últimas votaciones</h4>
+            {% if latest_poll_list %}
+                <ul id="votaciones">
+                {% for poll in latest_poll_list %}
+                    <li><a href="/polls/{{ poll.key.id }}/">{{ poll.title }}</a></li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p>Ninguna votación en curso.</p>
+            {% endif %}
+        </div>
+
+        <div class="span6">
+            <h4>Crea tu propia votación</h4>
+            <form class="form-horizontal">
+              <div class="control-group">
+                <label class="control-label" for="inputTitulo">Título</label>
+                <div class="controls">
+                  <input name="title" type="text" id="inputTitulo" placeholder="¿De que va la votación?">
+                </div>
+              </div>
+              <div class="control-group">
+                <label class="control-label">¿Opciones?</label>
+                <div class="controls">
+                  <button id="añadirOpcion" class="btn" href="#"><i class="icon-plus"></i> Añadir opción</button>
+                </div>
+              </div>
+              <div id="opciones">
+              </div>
+              <div class="control-group">
+                <div class="controls">
+                  <button id="submitVotacion" type="submit" class="btn btn-primary"><i class="icon-pencil icon-white"></i> Crear votación</button>
+                </div>
+              </div>
+            </form>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="footer">
+        <p>© BSDT - Grupo 3 2013</p>
+      </div>
+
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/resources/js/jquery.js"></script>
+    <script src="/resources/js/bootstrap-transition.js"></script>
+    <script src="/resources/js/bootstrap-alert.js"></script>
+    <script src="/resources/js/bootstrap-modal.js"></script>
+    <script src="/resources/js/bootstrap-button.js"></script>
+    <script src="/resources/js/bootstrap-collapse.js"></script>
+
+    <script src="/resources/js/bsdt-app.js"></script>
+    <script>
+        $(document).ready(function() {
+            var total_opciones = 0;
+            // --------------------------------------------- HANDLERS DE BOTONES
+           $("#añadirOpcion").click(function(event) {
+                event.preventDefault();
+                total_opciones = total_opciones + 1;
+                añadirOpcion(total_opciones);
+            });
+
+           $("#submitVotacion").click(function(event) {
+                event.preventDefault();
+                var b = $("#submitVotacion");
+                if (!b.hasClass("disabled")) {
+                    b.addClass("disabled");
+                    b.html('<i class="icon-refresh"></i> Enviando...');
+                    var form_object = serializarVotacion();
+
+                    $.ajax({
+                            url: '/polls/new/',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify(form_object),
+                            processData: false,
+                            dataType: 'json'
+                        }).done(function(data) {
+                                var b = $("#submitVotacion");
+                                b.removeClass("disabled");
+                                b.html('<i class="icon-ok"></i> ¡Enviado!');
+                                b.addClass('btn-success');
+                                insertarVotacion(data.id, data.title);
+                                setInterval(function() {
+                                    b.removeClass('btn-success');
+                                    b.html('<i class="icon-pencil icon-white"></i> Crear votación');
+                                }, 1000);
+                        });
+                }
+
+            });
+        });
+    </script>
+
+
+
+</body><style type="text/css"></style></html>
